@@ -14,6 +14,13 @@ const windowHeight = Dimensions.get('window').height;
 
 export default function Detail({navigation, route}){
   let {productDetail} = route.params;
+  let productAdd = {
+    id: productDetail.id,
+    name: productDetail.name,
+    price: productDetail.price,
+    image: productDetail.image,
+    quantity: 1
+  }
 
     return (
       <View style={styles.container}>
@@ -57,7 +64,7 @@ export default function Detail({navigation, route}){
           </View>
         </ScrollView>
         <View style={styles.bottomOption}>
-          <TouchableOpacity style={styles.cartTouch}>
+          <TouchableOpacity style={styles.cartTouch} onPress={() => (navigation.navigate('Cart', {productDetail: productAdd}))}>
             <Text style={styles.cartText}>Thêm vào giỏ hàng</Text>
           </TouchableOpacity>
         </View>
