@@ -152,7 +152,7 @@ export default class Cart extends Component {
   removeItemCart(product) {
     let products = this.state.cart.products;
     let idx = this.search(product, products);
-    let totalPrice = this.state.cart.totalPrice - product.price * product.quantity;
+    let totalPrice = this.state.cart.totalPrice - parseInt(product.price.split('.').join('')) * product.quantity;
     // Remove single item
     products.splice(idx, 1);
     // Update the state
