@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import {
   View,
   Text,
@@ -69,9 +69,9 @@ export default class Cart extends Component {
   }
 
   async componentDidMount() {
-    const {route} = this.props;
+    const { route } = this.props;
     this.getCart().then(() => {
-      let {productDetail} = route.params;
+      let { productDetail } = route.params;
       this.countQuantity();
       if (productDetail != null) {
         this.addItemCart(productDetail);
@@ -133,20 +133,63 @@ export default class Cart extends Component {
   }
 
   handleBook() {
-    this.removeCart();
-    Alert.alert(
-      'Đặt thành công',
-      'Chúng tôi sẽ liên lạc tới bạn sớm nhất!',
-      [
-        {
-          text: 'Đã hiểu',
-          onPress: () => {
-            this.props.navigation.navigate('Home');
-          },
+    var bill = this.state.cart;
+
+    if (this.state.nameInput != '' && this.state.phoneInput != '' && this.state.addressInput != '') {
+      this.removeCart();
+
+      fetch('http://192.168.1.3/uploadBill.php', {
+        method: 'POST',
+        headers: {
+          'Accept': 'application/json',
+          'Content-Type': 'application/json'
         },
-      ],
-      {cancelable: false},
-    );
+        body: JSON.stringify({
+          name: this.state.nameInput,
+          phone: this.state.phoneInput,
+          address: this.state.addressInput,
+          bill_detail: JSON.stringify(this.state.cart)
+        }),
+      }).then((response) => response.json())
+        .then(function (data) {
+          // Chuyển qua trang Cám ơn sau khi đã lưu đơn hàng thành công
+          // navigation.navigate('Thanks', {
+          //   dataBill: data,
+          //   cartBill: cartBill
+          // });
+          console.log(data);
+        }).catch((error) => {
+          console.error(error);
+        });
+
+        Alert.alert(
+          'Đặt thành công',
+          'Đơn hàng sẽ được giao tới bạn sớm nhất!',
+          [
+            {
+              text: 'Đã hiểu',
+              onPress: () => {
+                this.props.navigation.navigate('Home');
+              },
+            },
+          ],
+          { cancelable: false },
+        );
+    } else {
+      Alert.alert(
+        'Vui lòng nhập thông tin đầy đủ',
+        'Chúng tôi cần thông tin chính xác!',
+        [
+          {
+            text: 'Đã hiểu',
+            onPress: () => {
+              //this.props.navigation.navigate('Home');
+            },
+          },
+        ],
+        { cancelable: false },
+      );
+    }
   }
 
   removeItemCart(product) {
@@ -216,56 +259,56 @@ export default class Cart extends Component {
           <View style={styles.cartReceipt}>
             <Text style={styles.cartProductText}>Đơn hàng của bạn</Text>
             {this.state.cart.products != null &&
-            this.state.cart.products.length > 0 ? (
-              this.state.cart.products.map((item, key) => {
-                return (
-                  <View key={key} style={styles.cartTag}>
-                    <View style={styles.cartCloseTag}></View>
-                    <View style={styles.cartContent}>
-                      <View style={styles.cartImageView}>
-                        <Image
-                          style={styles.cartImage}
-                          // source={{uri: item.image}}
-                          source={item.image}
-                        />
-                      </View>
-                      <View style={styles.cartInfo}>
-                        <Text style={styles.cartName}>{item.name}</Text>
-                        <View style={styles.row}></View>
-                        <Text style={styles.cartPrice}>{item.price} đ</Text>
-                        <InputSpinner
-                          min={1}
-                          step={1}
-                          rounded={false}
-                          showBorder={true}
-                          fontSize={12}
-                          inputStyle={{
-                            paddingVertical: 5,
-                          }}
-                          width={100}
-                          height={30}
-                          value={item.quantity}
-                          onIncrease={(increased) => {
-                            this.editItemCart(item, 'add');
-                            this.countQuantity();
-                          }}
-                          onDecrease={(decreased) => {
-                            this.editItemCart(item, 'sub');
-                            this.countQuantity();
-                          }}
-                          style={styles.cartSpinner}
-                        />
-                      </View>
-                      <View>
-                        <Button title="x" onPress={() => {this.removeItemCart(item)}} />
+              this.state.cart.products.length > 0 ? (
+                this.state.cart.products.map((item, key) => {
+                  return (
+                    <View key={key} style={styles.cartTag}>
+                      <View style={styles.cartCloseTag}></View>
+                      <View style={styles.cartContent}>
+                        <View style={styles.cartImageView}>
+                          <Image
+                            style={styles.cartImage}
+                            source={{ uri: item.image }}
+                          //source={item.image}
+                          />
+                        </View>
+                        <View style={styles.cartInfo}>
+                          <Text style={styles.cartName}>{item.name}</Text>
+                          <View style={styles.row}></View>
+                          <Text style={styles.cartPrice}>{item.price} đ</Text>
+                          <InputSpinner
+                            min={1}
+                            step={1}
+                            rounded={false}
+                            showBorder={true}
+                            fontSize={12}
+                            inputStyle={{
+                              paddingVertical: 5,
+                            }}
+                            width={100}
+                            height={30}
+                            value={item.quantity}
+                            onIncrease={(increased) => {
+                              this.editItemCart(item, 'add');
+                              this.countQuantity();
+                            }}
+                            onDecrease={(decreased) => {
+                              this.editItemCart(item, 'sub');
+                              this.countQuantity();
+                            }}
+                            style={styles.cartSpinner}
+                          />
+                        </View>
+                        <View>
+                          <Button title="x" onPress={() => { this.removeItemCart(item) }} />
+                        </View>
                       </View>
                     </View>
-                  </View>
-                );
-              })
-            ) : (
-              <Text> Không có sản phẩm trong giỏ hàng</Text>
-            )}
+                  );
+                })
+              ) : (
+                <Text> Không có sản phẩm trong giỏ hàng</Text>
+              )}
           </View>
         </ScrollView>
         <View style={styles.cartExtraInfo}>
@@ -281,14 +324,14 @@ export default class Cart extends Component {
               </View>
               <View style={styles.cartPriceTotal}>
                 <Text style={styles.cartProductTitle}>Thành tiền:</Text>
-                <Text style={[styles.cartProductNum, {color: '#B22222'}]}>
+                <Text style={[styles.cartProductNum, { color: '#B22222' }]}>
                   {this.state.cart.totalPrice}
                 </Text>
               </View>
             </View>
           </View>
           <View style={styles.cartOrder}>
-            <TouchableOpacity style={styles.cartOrderTouch} onPress={() => {this.handleBook()}}>
+            <TouchableOpacity style={styles.cartOrderTouch} onPress={() => { this.handleBook() }}>
               <Text style={styles.cartOrderText}>Đặt hàng</Text>
             </TouchableOpacity>
           </View>

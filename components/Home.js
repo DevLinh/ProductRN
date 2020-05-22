@@ -1,4 +1,4 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
 import {
   View,
   StyleSheet,
@@ -59,24 +59,120 @@ const listProduct = [
     price: '500.000',
   },
 ];
-export default function Home({navigation}) {
-  
+export default class Home extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      listProduct: [],
+      index: 0,
+      listBanner: [{
+        "id": "1",
+        "name": "banner1",
+        "link": "https://salt.tikicdn.com/cache/w885/ts/banner/6e/54/b4/79a2bf27de62d11106a5e8b5d20a8aba.jpg",
+        "image": null,
+        "enable_flg": null,
+        "created_at": "2020-05-20 21:44:06",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": "2",
+        "name": "banner2",
+        "link": "https://salt.tikicdn.com/cache/w885/ts/banner/17/5e/89/92ee781eaf30b6916bb6bf33d3acb964.jpg",
+        "image": null,
+        "enable_flg": null,
+        "created_at": "2020-05-20 21:44:06",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": "3",
+        "name": "banner3",
+        "link": "https://salt.tikicdn.com/cache/w885/ts/banner/ff/68/12/9c5ca2086b5ffcf84ef8b19e2c522670.jpg",
+        "image": null,
+        "enable_flg": null,
+        "created_at": "2020-05-26 21:45:11",
+        "updated_at": null,
+        "deleted_at": null
+      },
+      {
+        "id": "4",
+        "name": "banner4",
+        "link": "https://salt.tikicdn.com/cache/w885/ts/banner/9d/51/c7/c4559bf62630bf597bee4e50b5d56d81.jpg",
+        "image": null,
+        "enable_flg": null,
+        "created_at": "2020-05-20 21:45:11",
+        "updated_at": null,
+        "deleted_at": null
+      }]
+    }
+  }
+
+  componentDidMount() {
+    fetch('http://192.168.1.3/listbooks.php')
+      .then((response) => response.json())
+      .then((responseJson) => {
+        this.setState({
+          listProduct: responseJson,
+        });
+      });
+
+    // fetch('http://192.168.1.3/loadbanner.php')
+    // .then((response) => response.json())
+    // .then((responseJson) => {
+    //   this.setState({
+    //     listBanner: responseJson,
+    //   });
+    //   console.log(responseJson[0].link);
+    //   console.log(typeof(this.state.listBanner[this.state.index].link));
+    //   console.log(this.state.listBanner[this.state.index].link);
+    // });
+
+    this._interval = setInterval(() => {
+      this.changeBanner();
+    }, 3000);
+
+  }
+
+  componentWillUnmount() {
+    clearInterval(this._interval);
+  }
+
+  changeBanner() {
+    let index = this.state.index;
+    index = index + 1;
+    if (index == this.state.listBanner.length) {
+      index = 0;
+    }
+    this.setState({
+      index: index
+    })
+  }
+
+  render() {
+    const { navigation } = this.props;
     return (
       <View style={styles.container}>
         <View style={styles.banner}>
           <Image
-            style={{width: '100%', height: '100%'}}
-            source={require('../src/image/banner.jpg')}
+            style={{ width: '100%', height: '100%' }}
+            source={{ uri: this.state.listBanner[this.state.index].link }}
           />
         </View>
         <View style={styles.listProduct}>
           {/* Dùng Flatlist show danh sách product */}
           <FlatList
-            data={listProduct}
-            renderItem={({item}) => (
+            data={this.state.listProduct}
+            renderItem={({ item }) => (
               <View style={styles.productView}>
-                <TouchableOpacity style={styles.productTouch} onPress={() => (navigation.navigate('Detail', {productDetail: item}))}>
-                  <Image source={item.image} style={styles.productImage} />
+                <TouchableOpacity
+                  style={styles.productTouch}
+                  onPress={() =>
+                    navigation.navigate('Detail', { productDetail: item })
+                  }>
+                  {/* Đối với hình ảnh dùng source từ link uri */}
+                  <Image source={{ uri: item.image }} style={styles.productImage} />
+                  {/* <Image source={item.image} style={styles.productImage} /> */}
                   <Text style={styles.productName}>{item.name}</Text>
                   <Text style={styles.productPrice}>{item.price}</Text>
                 </TouchableOpacity>
@@ -90,7 +186,7 @@ export default function Home({navigation}) {
         </View>
       </View>
     );
-  
+  }
 }
 
 const styles = StyleSheet.create({
@@ -110,44 +206,44 @@ const styles = StyleSheet.create({
     borderRadius: 2,
     margin: 4,
     backgroundColor: '#fff',
-    shadowColor: "#000",
+    shadowColor: '#000',
     shadowOffset: {
       width: 0,
       height: 2,
     },
     shadowOpacity: 0.5,
-    shadowRadius: 4
-    },
+    shadowRadius: 4,
+  },
 
-    productTouch: {
-      flex: 9,
-      alignItems: 'center',
-      justifyContent: 'center',
-      textAlign: 'center'
-    },
-    productImage: {
-      width: 80,
-      height: 100,
-      marginTop: 10,
-      marginBottom: 15
-    },
-    productName: {
-      fontSize: 15,
-    },
-    productPrice: {
-      color: 'red',
-      fontSize: 16,
-      fontWeight: 'bold',
-      marginVertical: 8
-    },
-    detailTouch: {
-      flex: 1,
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-      paddingVertical: 10,
-      borderTopWidth: 1,
-      borderTopColor: '#eee',
-      backgroundColor: '#f9f9f9'
-    }
+  productTouch: {
+    flex: 9,
+    alignItems: 'center',
+    justifyContent: 'center',
+    textAlign: 'center',
+  },
+  productImage: {
+    width: 80,
+    height: 100,
+    marginTop: 10,
+    marginBottom: 15,
+  },
+  productName: {
+    fontSize: 15,
+  },
+  productPrice: {
+    color: 'red',
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginVertical: 8,
+  },
+  detailTouch: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 10,
+    borderTopWidth: 1,
+    borderTopColor: '#eee',
+    backgroundColor: '#f9f9f9',
+  },
 });

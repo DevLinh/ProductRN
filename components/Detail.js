@@ -26,8 +26,12 @@ export default function Detail({navigation, route}){
       <View style={styles.container}>
         <ScrollView style={styles.productDetail}>
           <View style={{alignItems: 'center'}}>
-            <Image
+            {/* <Image
               source={productDetail.image}
+              style={styles.productDetailImg}
+            /> */}
+            <Image
+              source={{uri: productDetail.image}}
               style={styles.productDetailImg}
             />
           </View>
